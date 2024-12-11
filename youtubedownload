@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube 動画情報取得ツール</title>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        .input-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        #video-details {
+            margin-top: 20px;
+        }
+        #video-details p {
+            font-size: 16px;
+        }
+        #video-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        iframe {
+            width: 100%;
+            max-width: 560px;
+            height: 315px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>YouTube 動画情報取得ツール</h1>
+    
+    <div class="input-container">
+        <label for="video-id">YouTube動画IDを入力：</label>
+        <input type="text" id="video-id" placeholder="動画IDを入力してください" />
+        <button onclick="getVideoDetails()">動画情報取得</button>
+    </div>
+    
+    <div id="video-details">
+        <!-- 動画情報がここに表示されます -->
+    </div>
+
+    <div id="video-container">
+        <!-- 動画が埋め込まれる場所 -->
+    </div>
+
+    <script>
+        // APIキーを設定
+        const apiKey = 'YOUR_API_KEY_HERE'; // ここにあなたのAPIキーを挿入
+
+        // YouTube APIから動画情報を取得
+        function getVideoDetails() {
+            const videoId = document.getElementById('video-id').value.trim();
+            if (!videoId) {
+                alert('動画IDを入力してください');
+                return;
+            }
+
+            const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${apiKey}`;
+            
+            // Fetch APIを使ってデータを取得
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.items.length > 0) {
+                        const video = data.items[0];
+                        const snippet = video.snippet;
+                        const statistics = video.statistics;
+
+                        // 動画情報を表示
+                        document.getElementById('video-details').innerHTML = `
+                            <p><strong>タイトル:</strong> ${snippet.title}</p>
+                            <p><strong>説明:</strong> ${snippet.description}</p>
+                            <p><strong>公開日:</strong> ${snippet.publishedAt}</p>
+                            <p><strong>再生回数:</strong> ${statistics.viewCount}</p>
+                            <p><strong>いいね数:</strong> ${statistics.likeCount || 'N/A'}</p>
+                            <p><strong>嫌いな数:</strong> ${statistics.dislikeCount || 'N/A'}</p>
+                        `;
+
+                        // 動画の埋め込み表示
+                        document.getElementById('video-container').innerHTML = `
+                            <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        `;
+                    } else {
+                        alert('指定した動画IDの情報は見つかりませんでした');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching YouTube video data:', error);
+                    alert('動画情報の取得に失敗しました');
+                });
+        }
+    </script>
+
+</body>
+</html>
