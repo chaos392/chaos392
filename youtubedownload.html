@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>youtube-devtool</title>
+  <title>動画情報取得ツール</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -73,12 +73,24 @@
       word-wrap: break-word;
       margin-top: 10px;
     }
+    #comments {
+      list-style-type: none;
+      padding: 0;
+    }
     #comments li {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
     }
     #comments li:first-child {
       font-style: italic;
       color: #888;
+    }
+    .comment-author {
+      font-weight: bold;
+    }
+    .comment-body {
+      margin-top: 5px;
     }
   </style>
 </head>
@@ -111,14 +123,11 @@
   </div>
 
   <script>
-    const apiKey = 'YOUR_YOUTUBE_API_KEY'; // ここに取得したYouTube APIキーを入力
-
     document.addEventListener("DOMContentLoaded", () => {
       const urlParams = new URLSearchParams(window.location.search);
       const videoId = urlParams.get("videoId");
       if (videoId) {
         fetchVideoData(videoId);
-        fetchYouTubeComments(videoId);
       }
     });
 
@@ -134,47 +143,14 @@
       if (videoId) {
         updateUrlWithVideoId(videoId);
         await fetchVideoData(videoId);
-        fetchYouTubeComments(videoId);
       } else {
         alert("正しい動画IDまたはURLを入力してください。");
       }
     });
 
-    // YouTubeのコメントを取得する関数
-    async function fetchYouTubeComments(videoId) {
-      const apiUrl = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&key=${apiKey}`;
-      try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-          throw new Error("コメントの取得に失敗しました");
-        }
-        const data = await response.json();
-        displayComments(data.items);
-      } catch (error) {
-        console.error("エラー:", error);
-        alert("コメントの取得に失敗しました");
-      }
-    }
-
-    // コメントを表示する関数
-    function displayComments(comments) {
-      const commentsContainer = document.getElementById("comments");
-      commentsContainer.innerHTML = "";
-      if (comments.length === 0) {
-        commentsContainer.innerHTML = "<li>コメントはまだありません。</li>";
-      } else {
-        comments.forEach(commentData => {
-          const comment = commentData.snippet.topLevelComment.snippet;
-          const li = document.createElement("li");
-          li.innerHTML = `<strong>${comment.authorDisplayName}</strong>: ${comment.textDisplay}`;
-          commentsContainer.appendChild(li);
-        });
-      }
-    }
-
     async function fetchVideoData(videoId) {
       const apiUrl = `https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=api/v1/videos/${videoId}`;
-      overlay.style.display = "flex";
+      overlay.style.display = "flex";  // ローディングオーバーレイを表示
       try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -189,7 +165,7 @@
         alert(`エラー: ${error.message}`);
         console.error("詳細エラー:", error);
       } finally {
-        overlay.style.display = "none";
+        overlay.style.display = "none";  // ローディングオーバーレイを非表示
       }
     }
 
@@ -234,8 +210,8 @@
       document.getElementById("published").textContent = data.publishedText || "不明";
       document.getElementById("description").textContent = data.description || "なし";
       
-      results.style.display = "block";
-    }
-  </script>
-</body>
-</html>
+      const commentsContainer = document.getElementById("comments");
+      commentsContainer.innerHTML = "";  // 既存のコメントをクリア
+      if (data.comments && data.comments.length > 0) {
+        data.comments.forEach((comment) => {
+          const li
