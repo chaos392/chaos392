@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>動画情報取得ツールremix</title>
+  <title>動画情報取得ツール</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,24 +13,29 @@
     }
     h2 {
       text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
     }
     #video-form {
       text-align: center;
       margin-bottom: 20px;
     }
     #video-id {
-      padding: 10px;
+      padding: 12px;
       width: 60%;
       font-size: 16px;
       margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
     button {
-      padding: 10px 20px;
+      padding: 12px 20px;
       background-color: #4CAF50;
       color: white;
       font-size: 16px;
       border: none;
       cursor: pointer;
+      border-radius: 4px;
     }
     button:hover {
       background-color: #45a049;
@@ -47,19 +52,33 @@
       align-items: center;
       color: white;
       font-size: 20px;
+      font-weight: bold;
     }
     #results {
       display: none;
       margin-top: 20px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
     #video-player {
       width: 100%;
       max-width: 600px;
       margin: 20px 0;
+      border-radius: 8px;
     }
     #description {
       white-space: pre-wrap;
       word-wrap: break-word;
+      margin-top: 10px;
+    }
+    #comments li {
+      margin-bottom: 10px;
+    }
+    #comments li:first-child {
+      font-style: italic;
+      color: #888;
     }
   </style>
 </head>
@@ -67,16 +86,14 @@
   <h2>動画情報取得ツール</h2>
   <form id="video-form">
     <label for="video-id">動画IDまたはURL:</label>
-    <input type="text" id="video-id" required>
+    <input type="text" id="video-id" placeholder="例: dQw4w9WgXcQ" required>
     <button type="submit">取得</button>
   </form>
 
-  <div id="overlay">
-    <div id="loading-popup">取得中...</div>
-  </div>
+  <div id="overlay">取得中...</div>
 
   <div id="results">
-    <h2>動画情報</h2>
+    <h3>動画情報</h3>
     <p><strong>タイトル:</strong> <span id="title"></span></p>
     <p><strong>URL:</strong> <a id="stream-url" href="#" target="_blank">新しいタブで開く</a></p>
     <video id="video-player" controls>
@@ -121,38 +138,33 @@
 
     async function fetchVideoData(videoId) {
       const apiUrl = `https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=api/v1/videos/${videoId}`;
-      overlay.style.display = "flex";  // ローディングオーバーレイを表示
+      overlay.style.display = "flex";
       try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
           throw new Error("APIリクエストに失敗しました");
         }
         const data = await response.json();
-        console.log(data);  // デバッグ用にレスポンスを表示
         if (!data || !data.title) {
           throw new Error("無効なデータが返されました");
         }
         displayResults(data);
       } catch (error) {
         alert(`エラー: ${error.message}`);
-        console.error("詳細エラー:", error);  // コンソールにエラーを表示
+        console.error("詳細エラー:", error);
       } finally {
-        overlay.style.display = "none";  // ローディングオーバーレイを非表示
+        overlay.style.display = "none";
       }
     }
 
     function extractVideoId(input) {
       const videoIdPattern = /^[a-zA-Z0-9_-]{11}$/;
       const urlPattern = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/.*[?&]v=([a-zA-Z0-9_-]{11})|youtu\.be\/([a-zA-Z0-9_-]{11})/;
-      console.log(input);  // 入力内容をデバッグ表示
       if (videoIdPattern.test(input)) {
         return input;
       }
       const urlMatch = input.match(urlPattern);
-      if (urlMatch) {
-        return urlMatch[1] || urlMatch[2];
-      }
-      return null;
+      return urlMatch ? urlMatch[1] || urlMatch[2] : null;
     }
 
     function updateUrlWithVideoId(videoId) {
@@ -196,11 +208,10 @@
         });
       } else {
         const li = document.createElement("li");
-        li.textContent = "未実装";
+        li.textContent = "コメントはありません";
         commentsContainer.appendChild(li);
       }
 
-      // 必ず結果を表示
       results.style.display = "block";
     }
   </script>
