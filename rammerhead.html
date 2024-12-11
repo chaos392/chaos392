@@ -1,1 +1,140 @@
-<div jsname="jkaScf" jscontroller="szRU7e" class="w536ob" data-enable-interaction="true" data-url="https://1769414262-atari-embeds.googleusercontent.com/embeds/16cb204cf3a9d4d223a0a3fd8b0eec5d/inner-frame-minified.html?jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.ja.CXkrJm_kNxA.O%2Fam%3DAAAg%2Fd%3D1%2Frs%3DAHpOoo-CdY--kXj6GjmnSvnHXT2ARA2SVw%2Fm%3D__features__" data-code="<body> <h2>動画情報取得ツール</h2> <form id=&quot;video-form&quot;> <label for=&quot;video-id&quot;>動画IDまたはURL:</label> <input type=&quot;text&quot; id=&quot;video-id&quot; required=&quot;&quot;> <button type=&quot;submit&quot;>取得</button> </form> <div id=&quot;overlay&quot;> <div id=&quot;loading-popup&quot;>取得中...</div> </div> <div id=&quot;results&quot;> <h2>動画情報</h2> <p><strong>タイトル:</strong> <span id=&quot;title&quot;></span></p> <p><strong>URL:</strong> <a id=&quot;stream-url&quot; href=&quot;#&quot; target=&quot;_blank&quot;>ダウンロードリンク</a></p> <video id=&quot;video-player&quot; controls=&quot;&quot;> <source id=&quot;video-source&quot; type=&quot;video/mp4&quot;> お使いのブラウザは動画の再生をサポートしていません。 </video> <p><strong>再生回数:</strong> <span id=&quot;views&quot;></span></p> <p><strong>高評価数:</strong> <span id=&quot;likes&quot;></span></p> <p><strong>公開日時:</strong> <span id=&quot;published&quot;></span></p> <p><strong>概要:</strong></p> <pre id=&quot;description&quot;></pre> <h3>コメント</h3> <ul id=&quot;comments&quot;></ul> </div> <script> document.addEventListener(&quot;DOMContentLoaded&quot;, () => { const urlParams = new URLSearchParams(window.location.search); const videoId = urlParams.get(&quot;videoId&quot;); if (videoId) { fetchVideoData(videoId); } }); const form = document.getElementById(&quot;video-form&quot;); const overlay = document.getElementById(&quot;overlay&quot;); const results = document.getElementById(&quot;results&quot;); form.addEventListener(&quot;submit&quot;, async (e) => { e.preventDefault(); const videoIdInput = document.getElementById(&quot;video-id&quot;); const input = videoIdInput.value.trim(); const videoId = extractVideoId(input); if (videoId) { updateUrlWithVideoId(videoId); await fetchVideoData(videoId); } else { alert(&quot;正しい動画IDまたはURLを入力してください。&quot;); } }); async function fetchVideoData(videoId) { const apiUrl = `https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=api/v1/videos/${videoId}`; overlay.style.display = &quot;block&quot;; try { const response = await fetch(apiUrl); if (!response.ok) { throw new Error(&quot;APIリクエストに失敗しました&quot;); } const data = await response.json(); displayResults(data); } catch (error) { alert(`エラー: ${error.message}`); } finally { overlay.style.display = &quot;none&quot;; } } function extractVideoId(input) { const videoIdPattern = /^[a-zA-Z0-9_-]{11}$/; const urlPattern = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/.*[?&amp;]v=([a-zA-Z0-9_-]{11})|youtu\.be\/([a-zA-Z0-9_-]{11})/; if (videoIdPattern.test(input)) { return input; } const urlMatch = input.match(urlPattern); if (urlMatch) { return urlMatch[1] || urlMatch[2]; } return null; } function updateUrlWithVideoId(videoId) { const currentUrl = new URL(window.location.href); currentUrl.searchParams.set(&quot;videoId&quot;, videoId); window.history.pushState(null, &quot;&quot;, currentUrl); } function displayResults(data) { document.getElementById(&quot;title&quot;).textContent = data.title; const formatStreams = data.formatStreams || []; const streamUrl = formatStreams.length > 0 ? formatStreams[0].url : null; const streamLink = document.getElementById(&quot;stream-url&quot;); const videoPlayer = document.getElementById(&quot;video-player&quot;); const videoSource = document.getElementById(&quot;video-source&quot;); if (streamUrl) { streamLink.href = streamUrl; streamLink.textContent = &quot;ダウンロードURL&quot;; videoSource.src = streamUrl; videoPlayer.style.display = &quot;block&quot;; videoPlayer.load(); } else { streamLink.textContent = &quot;映像付きストリームが見つかりません&quot;; streamLink.href = &quot;#&quot;; videoPlayer.style.display = &quot;none&quot;; } document.getElementById(&quot;views&quot;).textContent = data.viewCount || &quot;不明&quot;; document.getElementById(&quot;likes&quot;).textContent = data.likeCount || &quot;不明&quot;; document.getElementById(&quot;published&quot;).textContent = data.publishedText || &quot;不明&quot;; // 概要欄の改行を適用 document.getElementById(&quot;description&quot;).textContent = data.description || &quot;なし&quot;; const commentsContainer = document.getElementById(&quot;comments&quot;); commentsContainer.innerHTML = &quot;&quot;; if (data.comments &amp;&amp; data.comments.length > 0) { data.comments.forEach((comment) => { const li = document.createElement(&quot;li&quot;); li.textContent = `${comment.author}: ${comment.text}`; commentsContainer.appendChild(li); }); } else { const li = document.createElement(&quot;li&quot;); li.textContent = &quot;未実装&quot;; commentsContainer.appendChild(li); } results.style.display = &quot;block&quot;; } </script> </body>" jsaction="rcuQ6b:WYd;"><div class="EmVfjc qs41qe UzswCe" data-loadingmessage=" " jscontroller="qAKInc" jsaction="animationend:kWijWc;dyRcpb:dyRcpb" data-active="true" jsname="Hy6Uif" style="display: none;"><div class="Cg7hO" aria-live="assertive" jsname="vyyg5"> </div><div jsname="Hxlbvc" class="xu46lf"><div class="ir3uv uWlRce co39ub"><div class="xq3j6 ERcjC"><div class="X6jHbb GOJTSe"></div></div><div class="HBnAAc"><div class="X6jHbb GOJTSe"></div></div><div class="xq3j6 dj3yTd"><div class="X6jHbb GOJTSe"></div></div></div><div class="ir3uv GFoASc Cn087"><div class="xq3j6 ERcjC"><div class="X6jHbb GOJTSe"></div></div><div class="HBnAAc"><div class="X6jHbb GOJTSe"></div></div><div class="xq3j6 dj3yTd"><div class="X6jHbb GOJTSe"></div></div></div><div class="ir3uv WpeOqd hfsr6b"><div class="xq3j6 ERcjC"><div class="X6jHbb GOJTSe"></div></div><div class="HBnAAc"><div class="X6jHbb GOJTSe"></div></div><div class="xq3j6 dj3yTd"><div class="X6jHbb GOJTSe"></div></div></div><div class="ir3uv rHV3jf EjXFBf"><div class="xq3j6 ERcjC"><div class="X6jHbb GOJTSe"></div></div><div class="HBnAAc"><div class="X6jHbb GOJTSe"></div></div><div class="xq3j6 dj3yTd"><div class="X6jHbb GOJTSe"></div></div></div></div></div><iframe jsname="WMhH6e" class=" YMEQtf" frameborder="0" sandbox="allow-scripts allow-popups allow-forms allow-same-origin allow-popups-to-escape-sandbox allow-downloads allow-storage-access-by-user-activation" id="665359e51288a132_0" name="665359e51288a132_0" scrolling="no" title="カスタム埋め込み" aria-label="カスタム埋め込み" src="https://www.gstatic.com/atari/embeds/83a60601c213b72fb19c1855fb0c5f26/intermediate-frame-minified.html?jsh=m%3B%2F_%2Fscs%2Fabc-static%2F_%2Fjs%2Fk%3Dgapi.lb.ja.CXkrJm_kNxA.O%2Fam%3DAAAg%2Fd%3D1%2Frs%3DAHpOoo-CdY--kXj6GjmnSvnHXT2ARA2SVw%2Fm%3D__features__&amp;r=95327409"></iframe></div>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>動画情報取得ツール</title>
+</head>
+<body>
+  <h2>動画情報取得ツール</h2>
+  <form id="video-form">
+    <label for="video-id">動画IDまたはURL:</label>
+    <input type="text" id="video-id" required>
+    <button type="submit">取得</button>
+  </form>
+
+  <div id="overlay">
+    <div id="loading-popup">取得中...</div>
+  </div>
+
+  <div id="results">
+    <h2>動画情報</h2>
+    <p><strong>タイトル:</strong> <span id="title"></span></p>
+    <p><strong>URL:</strong> <a id="stream-url" href="#" target="_blank">ダウンロードリンク</a></p>
+    <video id="video-player" controls>
+      <source id="video-source" type="video/mp4">
+      お使いのブラウザは動画の再生をサポートしていません。
+    </video>
+    <p><strong>再生回数:</strong> <span id="views"></span></p>
+    <p><strong>高評価数:</strong> <span id="likes"></span></p>
+    <p><strong>公開日時:</strong> <span id="published"></span></p>
+    <p><strong>概要:</strong></p>
+    <pre id="description"></pre>
+
+    <h3>コメント</h3>
+    <ul id="comments"></ul>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const videoId = urlParams.get("videoId");
+      if (videoId) {
+        fetchVideoData(videoId);
+      }
+    });
+
+    const form = document.getElementById("video-form");
+    const overlay = document.getElementById("overlay");
+    const results = document.getElementById("results");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const videoIdInput = document.getElementById("video-id");
+      const input = videoIdInput.value.trim();
+      const videoId = extractVideoId(input);
+      if (videoId) {
+        updateUrlWithVideoId(videoId);
+        await fetchVideoData(videoId);
+      } else {
+        alert("正しい動画IDまたはURLを入力してください。");
+      }
+    });
+
+    async function fetchVideoData(videoId) {
+      const apiUrl = `https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=api/v1/videos/${videoId}`;
+      overlay.style.display = "block";
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error("APIリクエストに失敗しました");
+        }
+        const data = await response.json();
+        displayResults(data);
+      } catch (error) {
+        alert(`エラー: ${error.message}`);
+      } finally {
+        overlay.style.display = "none";
+      }
+    }
+
+    function extractVideoId(input) {
+      const videoIdPattern = /^[a-zA-Z0-9_-]{11}$/;
+      const urlPattern = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/.*[?&]v=([a-zA-Z0-9_-]{11})|youtu\.be\/([a-zA-Z0-9_-]{11})/;
+      if (videoIdPattern.test(input)) {
+        return input;
+      }
+      const urlMatch = input.match(urlPattern);
+      if (urlMatch) {
+        return urlMatch[1] || urlMatch[2];
+      }
+      return null;
+    }
+
+    function updateUrlWithVideoId(videoId) {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set("videoId", videoId);
+      window.history.pushState(null, "", currentUrl);
+    }
+
+    function displayResults(data) {
+      document.getElementById("title").textContent = data.title;
+      const formatStreams = data.formatStreams || [];
+      const streamUrl = formatStreams.length > 0 ? formatStreams[0].url : null;
+      const streamLink = document.getElementById("stream-url");
+      const videoPlayer = document.getElementById("video-player");
+      const videoSource = document.getElementById("video-source");
+      if (streamUrl) {
+        streamLink.href = streamUrl;
+        streamLink.textContent = "ダウンロードURL";
+        videoSource.src = streamUrl;
+        videoPlayer.style.display = "block";
+        videoPlayer.load();
+      } else {
+        streamLink.textContent = "映像付きストリームが見つかりません";
+        streamLink.href = "#";
+        videoPlayer.style.display = "none";
+      }
+      document.getElementById("views").textContent = data.viewCount || "不明";
+      document.getElementById("likes").textContent = data.likeCount || "不明";
+      document.getElementById("published").textContent = data.publishedText || "不明";
+
+      document.getElementById("description").textContent = data.description || "なし";
+      const commentsContainer = document.getElementById("comments");
+      commentsContainer.innerHTML = "";
+      if (data.comments && data.comments.length > 0) {
+        data.comments.forEach((comment) => {
+          const li = document.createElement("li");
+          li.textContent = `${comment.author}: ${comment.text}`;
+          commentsContainer.appendChild(li);
+        });
+      } else {
+        const li = document.createElement("li");
+        li.textContent = "未実装";
+        commentsContainer.appendChild(li);
+      }
+      results.style.display = "block";
+    }
+  </script>
+</body>
+</html>
