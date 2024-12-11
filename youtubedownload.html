@@ -73,24 +73,12 @@
       word-wrap: break-word;
       margin-top: 10px;
     }
-    #comments {
-      list-style-type: none;
-      padding: 0;
-    }
     #comments li {
-      margin-bottom: 15px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 10px;
+      margin-bottom: 10px;
     }
     #comments li:first-child {
       font-style: italic;
       color: #888;
-    }
-    .comment-author {
-      font-weight: bold;
-    }
-    .comment-body {
-      margin-top: 5px;
     }
   </style>
 </head>
@@ -149,8 +137,8 @@
     });
 
     async function fetchVideoData(videoId) {
-      const apiUrl = `https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=api/v1/videos/${videoId}`;
-      overlay.style.display = "flex";  // ローディングオーバーレイを表示
+      const apiUrl = https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=api/v1/videos/${videoId};
+      overlay.style.display = "flex";
       try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -162,10 +150,10 @@
         }
         displayResults(data);
       } catch (error) {
-        alert(`エラー: ${error.message}`);
+        alert(エラー: ${error.message});
         console.error("詳細エラー:", error);
       } finally {
-        overlay.style.display = "none";  // ローディングオーバーレイを非表示
+        overlay.style.display = "none";
       }
     }
 
@@ -211,7 +199,21 @@
       document.getElementById("description").textContent = data.description || "なし";
       
       const commentsContainer = document.getElementById("comments");
-      commentsContainer.innerHTML = "";  // 既存のコメントをクリア
+      commentsContainer.innerHTML = "";
       if (data.comments && data.comments.length > 0) {
         data.comments.forEach((comment) => {
-          const li
+          const li = document.createElement("li");
+          li.textContent = ${comment.author}: ${comment.text};
+          commentsContainer.appendChild(li);
+        });
+      } else {
+        const li = document.createElement("li");
+        li.textContent = "コメントはありません";
+        commentsContainer.appendChild(li);
+      }
+
+      results.style.display = "block";
+    }
+  </script>
+</body>
+</html>
