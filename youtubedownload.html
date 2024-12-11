@@ -7,152 +7,67 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 20px;
       background-color: #f4f4f9;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    h2 {
       color: #333;
-      font-size: 2em;
-      margin-bottom: 20px;
     }
-
-    #video-form {
-      background-color: #ffffff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 500px;
+    h2 {
       text-align: center;
     }
-
-    #video-form label {
-      font-size: 1.2em;
-      margin-bottom: 10px;
-      display: block;
+    #video-form {
+      text-align: center;
+      margin-bottom: 20px;
     }
-
-    #video-form input {
-      width: 100%;
+    #video-id {
       padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 1em;
+      width: 60%;
+      font-size: 16px;
+      margin-right: 10px;
     }
-
-    #video-form button {
+    button {
       padding: 10px 20px;
-      background-color: #007bff;
-      color: #fff;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
-      font-size: 1em;
     }
-
-    #video-form button:hover {
-      background-color: #0056b3;
+    button:hover {
+      background-color: #45a049;
     }
-
     #overlay {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
+      width: 100%;
+      height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
-      display: none;
       justify-content: center;
       align-items: center;
+      color: white;
+      font-size: 20px;
     }
-
-    #loading-popup {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      font-size: 1.2em;
-      color: #333;
-    }
-
     #results {
       display: none;
-      background-color: #ffffff;
-      padding: 20px;
-      margin-top: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+    }
+    #video-player {
       width: 100%;
       max-width: 600px;
+      margin: 20px 0;
     }
-
-    #results h2 {
-      color: #333;
-      font-size: 1.5em;
-      margin-bottom: 15px;
-    }
-
-    #results p {
-      font-size: 1.1em;
-      line-height: 1.6;
-    }
-
-    #results pre {
-      background-color: #f9f9f9;
-      padding: 15px;
-      border-radius: 5px;
-      font-family: monospace;
+    #description {
       white-space: pre-wrap;
+      word-wrap: break-word;
     }
-
-    #results video {
-      width: 100%;
-      max-width: 600px;
-      margin-top: 20px;
-      border-radius: 8px;
-    }
-
-    #comments {
-      margin-top: 20px;
-    }
-
-    #comments li {
-      background-color: #f8f9fa;
-      margin: 5px 0;
-      padding: 10px;
-      border-radius: 5px;
-      list-style-type: none;
-    }
-
-    #comments li:nth-child(odd) {
-      background-color: #e9ecef;
-    }
-
-    a {
-      color: #007bff;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-
   </style>
 </head>
 <body>
-
   <h2>動画情報取得ツール</h2>
-
   <form id="video-form">
     <label for="video-id">動画IDまたはURL:</label>
-    <input type="text" id="video-id" required="">
+    <input type="text" id="video-id" required>
     <button type="submit">取得</button>
   </form>
 
@@ -164,7 +79,7 @@
     <h2>動画情報</h2>
     <p><strong>タイトル:</strong> <span id="title"></span></p>
     <p><strong>URL:</strong> <a id="stream-url" href="#" target="_blank">ダウンロードリンク</a></p>
-    <video id="video-player" controls="">
+    <video id="video-player" controls>
       <source id="video-source" type="video/mp4">
       お使いのブラウザは動画の再生をサポートしていません。
     </video>
@@ -206,24 +121,30 @@
 
     async function fetchVideoData(videoId) {
       const apiUrl = `https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=api/v1/videos/${videoId}`;
-      overlay.style.display = "flex";
+      overlay.style.display = "flex";  // ローディングオーバーレイを表示
       try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
           throw new Error("APIリクエストに失敗しました");
         }
         const data = await response.json();
+        console.log(data);  // デバッグ用にレスポンスを表示
+        if (!data || !data.title) {
+          throw new Error("無効なデータが返されました");
+        }
         displayResults(data);
       } catch (error) {
         alert(`エラー: ${error.message}`);
+        console.error("詳細エラー:", error);  // コンソールにエラーを表示
       } finally {
-        overlay.style.display = "none";
+        overlay.style.display = "none";  // ローディングオーバーレイを非表示
       }
     }
 
     function extractVideoId(input) {
       const videoIdPattern = /^[a-zA-Z0-9_-]{11}$/;
       const urlPattern = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/.*[?&]v=([a-zA-Z0-9_-]{11})|youtu\.be\/([a-zA-Z0-9_-]{11})/;
+      console.log(input);  // 入力内容をデバッグ表示
       if (videoIdPattern.test(input)) {
         return input;
       }
@@ -247,6 +168,7 @@
       const streamLink = document.getElementById("stream-url");
       const videoPlayer = document.getElementById("video-player");
       const videoSource = document.getElementById("video-source");
+      
       if (streamUrl) {
         streamLink.href = streamUrl;
         streamLink.textContent = "ダウンロードURL";
@@ -258,6 +180,29 @@
         streamLink.href = "#";
         videoPlayer.style.display = "none";
       }
+
       document.getElementById("views").textContent = data.viewCount || "不明";
       document.getElementById("likes").textContent = data.likeCount || "不明";
-      document.getElementById("published").
+      document.getElementById("published").textContent = data.publishedText || "不明";
+      document.getElementById("description").textContent = data.description || "なし";
+      
+      const commentsContainer = document.getElementById("comments");
+      commentsContainer.innerHTML = "";
+      if (data.comments && data.comments.length > 0) {
+        data.comments.forEach((comment) => {
+          const li = document.createElement("li");
+          li.textContent = `${comment.author}: ${comment.text}`;
+          commentsContainer.appendChild(li);
+        });
+      } else {
+        const li = document.createElement("li");
+        li.textContent = "未実装";
+        commentsContainer.appendChild(li);
+      }
+
+      // 必ず結果を表示
+      results.style.display = "block";
+    }
+  </script>
+</body>
+</html>
