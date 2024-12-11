@@ -1,106 +1,263 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube 動画情報取得ツール</title>
-    <script src="https://apis.google.com/js/api.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            max-width: 600px;
-            margin: auto;
-        }
-        h1 {
-            text-align: center;
-        }
-        .input-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        #video-details {
-            margin-top: 20px;
-        }
-        #video-details p {
-            font-size: 16px;
-        }
-        #video-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        iframe {
-            width: 100%;
-            max-width: 560px;
-            height: 315px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>動画情報取得ツール</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    h2 {
+      color: #333;
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    #video-form {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+
+    #video-form label {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    #video-form input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+
+    #video-form button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    #video-form button:hover {
+      background-color: #0056b3;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #loading-popup {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      font-size: 1.2em;
+      color: #333;
+    }
+
+    #results {
+      display: none;
+      background-color: #ffffff;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    #results h2 {
+      color: #333;
+      font-size: 1.5em;
+      margin-bottom: 15px;
+    }
+
+    #results p {
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+
+    #results pre {
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 5px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+
+    #results video {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 20px;
+      border-radius: 8px;
+    }
+
+    #comments {
+      margin-top: 20px;
+    }
+
+    #comments li {
+      background-color: #f8f9fa;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 5px;
+      list-style-type: none;
+    }
+
+    #comments li:nth-child(odd) {
+      background-color: #e9ecef;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+  </style>
 </head>
 <body>
 
-    <h1>YouTube 動画情報取得ツール</h1>
-    
-    <div class="input-container">
-        <label for="video-id">YouTube動画IDを入力：</label>
-        <input type="text" id="video-id" placeholder="動画IDを入力してください" />
-        <button onclick="getVideoDetails()">動画情報取得</button>
-    </div>
-    
-    <div id="video-details">
-        <!-- 動画情報がここに表示されます -->
-    </div>
+  <h2>動画情報取得ツール</h2>
 
-    <div id="video-container">
-        <!-- 動画が埋め込まれる場所 -->
-    </div>
+  <form id="video-form">
+    <label for="video-id">動画IDまたはURL:</label>
+    <input type="text" id="video-id" required="">
+    <button type="submit">取得</button>
+  </form>
 
-    <script>
-        // APIキーを設定
-        const apiKey = 'YOUR_API_KEY_HERE'; // ここにあなたのAPIキーを挿入
+  <div id="overlay">
+    <div id="loading-popup">取得中...</div>
+  </div>
 
-        // YouTube APIから動画情報を取得
-        function getVideoDetails() {
-            const videoId = document.getElementById('video-id').value.trim();
-            if (!videoId) {
-                alert('動画IDを入力してください');
-                return;
-            }
+  <div id="results">
+    <h2>動画情報</h2>
+    <p><strong>タイトル:</strong> <span id="title"></span></p>
+    <p><strong>URL:</strong> <a id="stream-url" href="#" target="_blank">ダウンロードリンク</a></p>
+    <video id="video-player" controls="">
+      <source id="video-source" type="video/mp4">
+      お使いのブラウザは動画の再生をサポートしていません。
+    </video>
+    <p><strong>再生回数:</strong> <span id="views"></span></p>
+    <p><strong>高評価数:</strong> <span id="likes"></span></p>
+    <p><strong>公開日時:</strong> <span id="published"></span></p>
+    <p><strong>概要:</strong></p>
+    <pre id="description"></pre>
 
-            const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${apiKey}`;
-            
-            // Fetch APIを使ってデータを取得
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.items.length > 0) {
-                        const video = data.items[0];
-                        const snippet = video.snippet;
-                        const statistics = video.statistics;
+    <h3>コメント</h3>
+    <ul id="comments"></ul>
+  </div>
 
-                        // 動画情報を表示
-                        document.getElementById('video-details').innerHTML = `
-                            <p><strong>タイトル:</strong> ${snippet.title}</p>
-                            <p><strong>説明:</strong> ${snippet.description}</p>
-                            <p><strong>公開日:</strong> ${snippet.publishedAt}</p>
-                            <p><strong>再生回数:</strong> ${statistics.viewCount}</p>
-                            <p><strong>いいね数:</strong> ${statistics.likeCount || 'N/A'}</p>
-                            <p><strong>嫌いな数:</strong> ${statistics.dislikeCount || 'N/A'}</p>
-                        `;
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const videoId = urlParams.get("videoId");
+      if (videoId) {
+        fetchVideoData(videoId);
+      }
+    });
 
-                        // 動画の埋め込み表示
-                        document.getElementById('video-container').innerHTML = `
-                            <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                        `;
-                    } else {
-                        alert('指定した動画IDの情報は見つかりませんでした');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching YouTube video data:', error);
-                    alert('動画情報の取得に失敗しました');
-                });
+    const form = document.getElementById("video-form");
+    const overlay = document.getElementById("overlay");
+    const results = document.getElementById("results");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const videoIdInput = document.getElementById("video-id");
+      const input = videoIdInput.value.trim();
+      const videoId = extractVideoId(input);
+      if (videoId) {
+        updateUrlWithVideoId(videoId);
+        await fetchVideoData(videoId);
+      } else {
+        alert("正しい動画IDまたはURLを入力してください。");
+      }
+    });
+
+    async function fetchVideoData(videoId) {
+      const apiUrl = `https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=api/v1/videos/${videoId}`;
+      overlay.style.display = "flex";
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error("APIリクエストに失敗しました");
         }
-    </script>
+        const data = await response.json();
+        displayResults(data);
+      } catch (error) {
+        alert(`エラー: ${error.message}`);
+      } finally {
+        overlay.style.display = "none";
+      }
+    }
 
-</body>
-</html>
+    function extractVideoId(input) {
+      const videoIdPattern = /^[a-zA-Z0-9_-]{11}$/;
+      const urlPattern = /(?:https?:\/\/)?(?:www\.)?youtube\.com\/.*[?&]v=([a-zA-Z0-9_-]{11})|youtu\.be\/([a-zA-Z0-9_-]{11})/;
+      if (videoIdPattern.test(input)) {
+        return input;
+      }
+      const urlMatch = input.match(urlPattern);
+      if (urlMatch) {
+        return urlMatch[1] || urlMatch[2];
+      }
+      return null;
+    }
+
+    function updateUrlWithVideoId(videoId) {
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set("videoId", videoId);
+      window.history.pushState(null, "", currentUrl);
+    }
+
+    function displayResults(data) {
+      document.getElementById("title").textContent = data.title;
+      const formatStreams = data.formatStreams || [];
+      const streamUrl = formatStreams.length > 0 ? formatStreams[0].url : null;
+      const streamLink = document.getElementById("stream-url");
+      const videoPlayer = document.getElementById("video-player");
+      const videoSource = document.getElementById("video-source");
+      if (streamUrl) {
+        streamLink.href = streamUrl;
+        streamLink.textContent = "ダウンロードURL";
+        videoSource.src = streamUrl;
+        videoPlayer.style.display = "block";
+        videoPlayer.load();
+      } else {
+        streamLink.textContent = "映像付きストリームが見つかりません";
+        streamLink.href = "#";
+        videoPlayer.style.display = "none";
+      }
+      document.getElementById("views").textContent = data.viewCount || "不明";
+      document.getElementById("likes").textContent = data.likeCount || "不明";
+      document.getElementById("published").
