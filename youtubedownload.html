@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>動画情報取得ツールremix</title>
+  <title>youtube-devtool</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -111,11 +111,14 @@
   </div>
 
   <script>
+    const apiKey = 'YOUR_YOUTUBE_API_KEY'; // ここに取得したYouTube APIキーを入力
+
     document.addEventListener("DOMContentLoaded", () => {
       const urlParams = new URLSearchParams(window.location.search);
       const videoId = urlParams.get("videoId");
       if (videoId) {
         fetchVideoData(videoId);
+        fetchYouTubeComments(videoId);
       }
     });
 
@@ -131,10 +134,43 @@
       if (videoId) {
         updateUrlWithVideoId(videoId);
         await fetchVideoData(videoId);
+        fetchYouTubeComments(videoId);
       } else {
         alert("正しい動画IDまたはURLを入力してください。");
       }
     });
+
+    // YouTubeのコメントを取得する関数
+    async function fetchYouTubeComments(videoId) {
+      const apiUrl = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&key=${apiKey}`;
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error("コメントの取得に失敗しました");
+        }
+        const data = await response.json();
+        displayComments(data.items);
+      } catch (error) {
+        console.error("エラー:", error);
+        alert("コメントの取得に失敗しました");
+      }
+    }
+
+    // コメントを表示する関数
+    function displayComments(comments) {
+      const commentsContainer = document.getElementById("comments");
+      commentsContainer.innerHTML = "";
+      if (comments.length === 0) {
+        commentsContainer.innerHTML = "<li>コメントはまだありません。</li>";
+      } else {
+        comments.forEach(commentData => {
+          const comment = commentData.snippet.topLevelComment.snippet;
+          const li = document.createElement("li");
+          li.innerHTML = `<strong>${comment.authorDisplayName}</strong>: ${comment.textDisplay}`;
+          commentsContainer.appendChild(li);
+        });
+      }
+    }
 
     async function fetchVideoData(videoId) {
       const apiUrl = `https://script.google.com/macros/s/AKfycbxYjOWULjin5kpp-NcjjjGujVX3wy1TEJVUR2AZtR6-5c_q7GBr1Nctl2_Kat4lSboD/exec?videoId=api/v1/videos/${videoId}`;
@@ -198,20 +234,6 @@
       document.getElementById("published").textContent = data.publishedText || "不明";
       document.getElementById("description").textContent = data.description || "なし";
       
-      const commentsContainer = document.getElementById("comments");
-      commentsContainer.innerHTML = "";
-      if (data.comments && data.comments.length > 0) {
-        data.comments.forEach((comment) => {
-          const li = document.createElement("li");
-          li.textContent = `${comment.author}: ${comment.text}`;
-          commentsContainer.appendChild(li);
-        });
-      } else {
-        const li = document.createElement("li");
-        li.textContent = "コメントはありません";
-        commentsContainer.appendChild(li);
-      }
-
       results.style.display = "block";
     }
   </script>
