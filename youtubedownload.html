@@ -146,7 +146,6 @@
       try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
-          throw new Error("コメントの取得に失敗しました");
         }
         const data = await response.json();
         displayComments(data.items);
